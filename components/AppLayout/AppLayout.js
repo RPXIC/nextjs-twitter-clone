@@ -1,11 +1,17 @@
-import styles from '../../styles/Home.module.css'
+import styles, { globalStyles } from './styles'
 
 const AppLayout = ({ children }) => {
     return (
         <>
-            <main className={styles.main}>
-                {children}
-            </main>
+            <div>
+                <main>
+                    {children}
+                </main>
+            </div>
+
+            <style jsx>{styles}</style>
+
+            <style jsx global>{globalStyles}</style>
         </>
     )
 }
