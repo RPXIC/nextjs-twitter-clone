@@ -1,14 +1,15 @@
 import { AppLayout, Devit } from "components"
 import { useEffect, useState } from "react"
+import useUser from "hooks/useUser"
+import { fetchLatestDevits } from "firebase/client"
 
 const HomePage = () => {
   const [timeline, setTimeline] = useState()
+  const user = useUser()
 
   useEffect(() => {
-    fetch("/api/statuses/home_timeline")
-      .then((res) => res.json())
-      .then(setTimeline)
-  }, [])
+    user && fetchLatestDevits().then(setTimeline)
+  }, [user])
 
   return (
     <>
@@ -18,15 +19,19 @@ const HomePage = () => {
         </header>
         <section>
           {timeline &&
-            timeline.map(({ id, username, avatar, message }) => (
-              <Devit
-                key={id}
-                username={username}
-                avatar={avatar}
-                message={message}
-                id={id}
-              />
-            ))}
+            timeline.map(
+              ({ id, userName, avatar, content, userId, createdAt }) => (
+                <Devit
+                  avatar={avatar}
+                  createdAt={createdAt}
+                  id={id}
+                  key={id}
+                  content={content}
+                  userName={userName}
+                  userId={userId}
+                />
+              )
+            )}
         </section>
         <nav></nav>
       </AppLayout>
@@ -34,7 +39,9 @@ const HomePage = () => {
       <style jsx>{`
         header {
           align-items: center;
-          border-bottom: 1px solid #ccc;
+          background: #ffffffaa;
+          backdrop-filter: blur(5px);
+          border-bottom: 1px solid #eee;
           height: 49px;
           display: flex;
           position: sticky;
@@ -45,17 +52,16 @@ const HomePage = () => {
         h2 {
           font-size: 21px;
           font-weight: 800;
+          padding-left: 15px;
         }
 
         nav {
+          background: #fff;
           bottom: 0;
-          border-top: 1px solid #ccc;
+          border-top: 1px solid #eee;
+          height: 49px;
           position: sticky;
           width: 100%;
-        }
-
-        section {
-          padding-top: 100px;
         }
       `}</style>
     </>
