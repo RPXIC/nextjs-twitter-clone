@@ -1,9 +1,9 @@
 import * as firebase from "firebase"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDSQg5R8eYPaHS-Bt0b7cs5m8I-cW6Lbpo",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "devter-30ad9.firebaseapp.com",
-  databaseURL: "https://devter-30ad9.firebaseio.com",
+  databaseURL: process.env.NEXT_PUBLIC_DB_URL,
   projectId: "devter-30ad9",
   storageBucket: "devter-30ad9.appspot.com",
   messagingSenderId: "19389826688",
@@ -38,37 +38,42 @@ export const loginWithGitHub = () => {
   return firebase.auth().signInWithPopup(githubProvider)
 }
 
-export const addDevit = ({ avatar, content, userId, userName }) => {
+export const addDevit = ({ avatar, content, userId, userName, img }) => {
   return db.collection("devits").add({
     avatar,
     content,
     userId,
     userName,
+    img,
     createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
     likesCount: 0,
     sharedCount: 0,
   })
 }
 
-export const fetchLatestDevits = () => {
-  return db
+export const fetchLatestDevits = async () => {
+  const devits = await db
     .collection("devits")
+    .orderBy("createdAt", "desc")
     .get()
-    .then(({ docs }) => {
-      return docs.map((doc) => {
-        const data = doc.data()
-        const id = doc.id
-        const { createdAt } = data
-        const date = new Date(createdAt.seconds * 1000)
-        const normalizedCreatedAt = new Intl.DateTimeFormat("es-ES").format(
-          date
-        )
 
-        return {
-          ...data,
-          id,
-          createdAt: normalizedCreatedAt,
-        }
-      })
-    })
+  const { docs } = devits
+
+  return docs.map((doc) => {
+    const data = doc.data()
+    const id = doc.id
+    const { createdAt } = data
+
+    return {
+      ...data,
+      id,
+      createdAt: +createdAt.toDate(),
+    }
+  })
+}
+
+export const uploadImage = (file) => {
+  const ref = firebase.storage().ref(`images/${file.name}`)
+  const task = ref.put(file)
+  return task
 }
