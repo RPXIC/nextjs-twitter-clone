@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import Head from "next/head"
 import { colors } from "styles/theme"
-import { AppLayout, Button } from "components"
+import { Button } from "components"
 import { Logo, GitHub } from "components/Icons"
 import { loginWithGitHub } from "firebase/client"
 import { useRouter } from "next/router"
@@ -30,25 +30,23 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <AppLayout>
-        <section>
-          <Logo width="100" />
-          <h1>Devter</h1>
-          <h2>
-            Talk about development <br /> with developers👩‍💻👨‍💻
-          </h2>
+      <section>
+        <Logo width="100" />
+        <h1>Devter</h1>
+        <h2>
+          Talk about development <br /> with developers👩‍💻👨‍💻
+        </h2>
 
-          <div>
-            {user === USER_STATES.NOT_LOGGED && (
-              <Button onClick={handleClick}>
-                <GitHub fill="#fff" width={24} height={24} />
-                Login with GitHub
-              </Button>
-            )}
-            {user === USER_STATES.NOT_KNOWN && <img src="/spinner.gif" />}
-          </div>
-        </section>
-      </AppLayout>
+        <div>
+          {user === USER_STATES.NOT_LOGGED && (
+            <Button onClick={handleClick}>
+              <GitHub fill="#fff" width={24} height={24} />
+              Login with GitHub
+            </Button>
+          )}
+          {user === USER_STATES.NOT_KNOWN && <img src="/spinner.gif" />}
+        </div>
+      </section>
 
       <style jsx>{`
         img {

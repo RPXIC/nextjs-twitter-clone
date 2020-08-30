@@ -1,5 +1,13 @@
-const MyApp = ({ Component, pageProps }) => {
-  return <Component {...pageProps} />
+import { AppLayout } from "components"
+
+const App = ({ Component, pageProps }) => {
+  return (
+    <>
+      <AppLayout>
+        <Component {...pageProps} />
+      </AppLayout>
+    </>
+  )
 }
 
-export default MyApp
+export default App
