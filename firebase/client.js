@@ -1,15 +1,6 @@
 import * as firebase from "firebase"
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: "devter-30ad9.firebaseapp.com",
-  databaseURL: process.env.NEXT_PUBLIC_DB_URL,
-  projectId: "devter-30ad9",
-  storageBucket: "devter-30ad9.appspot.com",
-  messagingSenderId: "19389826688",
-  appId: "1:19389826688:web:4b6e872d40586768ab4865",
-  measurementId: "G-NBXZFWFSXF",
-}
+const firebaseConfig = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_CONFIG)
 
 !firebase.apps.length && firebase.initializeApp(firebaseConfig)
 
@@ -51,26 +42,39 @@ export const addDevit = ({ avatar, content, userId, userName, img }) => {
   })
 }
 
-export const fetchLatestDevits = async () => {
-  const devits = await db
+const mapDevitFromFirebaseToDevitObject = (doc) => {
+  const data = doc.data()
+  const id = doc.id
+  const { createdAt } = data
+
+  return {
+    ...data,
+    id,
+    createdAt: +createdAt.toDate(),
+  }
+}
+
+export const listenLatestDevits = (callback) => {
+  return db
     .collection("devits")
     .orderBy("createdAt", "desc")
-    .get()
-
-  const { docs } = devits
-
-  return docs.map((doc) => {
-    const data = doc.data()
-    const id = doc.id
-    const { createdAt } = data
-
-    return {
-      ...data,
-      id,
-      createdAt: +createdAt.toDate(),
-    }
-  })
+    .limit(20)
+    .onSnapshot(({ docs }) => {
+      const newDevits = docs.map(mapDevitFromFirebaseToDevitObject)
+      callback(newDevits)
+    })
 }
+
+// export const fetchLatestDevits = async () => {
+//   const devits = await db
+//     .collection("devits")
+//     .orderBy("createdAt", "desc")
+//     .get()
+
+//   const { docs } = devits
+
+//   return docs.map(mapDevitFromFirebaseToDevitObject)
+// }
 
 export const uploadImage = (file) => {
   const ref = firebase.storage().ref(`images/${file.name}`)
